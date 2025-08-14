@@ -41,13 +41,21 @@ namespace LemProgress
 
             var list = Find.World.factionManager.AllFactions.ToList();
 
+            int countUpgraded = 0;
             foreach (var faction in list)                                                                                      
             {
                 if (faction.def.techLevel < targetLevel)
                 {
                     // don't upgrade every faction
-                    if(rand.Next(100) < 80)
-                        UpgradeFaction(faction, faction.def.techLevel, faction.def.techLevel+1);
+                    if (UpgradeFaction(faction, faction.def.techLevel, faction.def.techLevel + 1))
+                    {
+                        countUpgraded++;
+                        // only upgrade one faction to ultra
+                        if (targetLevel == TechLevel.Ultra)
+                            break;
+                    }
+
+
                 }
                 
             }
@@ -58,26 +66,29 @@ namespace LemProgress
         /// <summary>
         /// Upgrades a specific faction
         /// </summary>
-        public static void UpgradeFaction(Faction faction, TechLevel oldTechLevel, TechLevel newTechLevel)
+        public static bool UpgradeFaction(Faction faction, TechLevel oldTechLevel, TechLevel newTechLevel)
         {
-            if (faction == null || faction.def == null) return;
+            if (faction == null || faction.def == null) return false;
+
+            if (rand.Next(100) > 50)
+                return false;
 
             var oldLevel = faction.def.techLevel;
 
             if (oldTechLevel != oldLevel)
             {
                 Log.Message($"LemProg: Skipped {faction.Name} at {oldLevel}");
-                return;
+                return false;
             }
 
             if (faction.IsPlayer)
-                return;
+                return false;
 
             if (!faction.def.humanlikeFaction)
-                return;
+                return false;
 
             // Skip if already at or above target level
-            if (oldLevel >= newTechLevel) return;
+            if (oldLevel >= newTechLevel) return false;
 
             Log.Message($"LemProg: Upgrading {faction.Name} from {oldLevel} to {newTechLevel}");
 
@@ -90,25 +101,7 @@ namespace LemProgress
                 FactionDefUtility.CopyDefToFactionEnhanced(faction, choices[rand.Next(choices.Count)], new DefCopyOptions(){});
             }
 
-            /*
-            // Create a new def or modify the existing one
-            UpdateFactionDef(faction, newTechLevel);
-
-            // Update faction name if needed
-            UpdateFactionName(faction, oldLevel, newTechLevel);
-
-            // Update faction bases
-            UpdateFactionBases(faction, newTechLevel);
-
-            // Update faction relationships and goodwill if needed
-            UpdateFactionRelations(faction, oldLevel, newTechLevel);
-
-            // Update faction's available items and equipment
-            UpdateFactionEquipment(faction, newTechLevel);
-            */
-
-
-
+            return true;
         }
 
         /// <summary>
