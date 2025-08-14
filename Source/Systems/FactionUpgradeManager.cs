@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LemProgress.Systems.LemProgress.Systems;
 using Verse;
 
 namespace LemProgress.Systems
@@ -23,6 +24,9 @@ namespace LemProgress.Systems
             }
 
             if (!ValidateWorld()) return;
+
+            // First, consolidate duplicate factions if needed
+            ConsolidateDuplicateFactionsIfNeeded();
 
             var factionsToUpgrade = GetUpgradeableFactions(oldLevel, newLevel);
             var upgradeCount = 0;
@@ -79,6 +83,30 @@ namespace LemProgress.Systems
             }
 
             Log.Message("[" + ModCore.ModId + "] Upgraded " + upgradeCount + " factions to " + newLevel.ToString());
+
+            // Clean up after upgrades
+            FactionDefManager.CleanupRemovedFactions();
+        }
+
+        private static void ConsolidateDuplicateFactionsIfNeeded()
+        {
+            var stats = FactionDefManager.GetDefUsageStats();
+            bool needsConsolidation = false;
+
+            foreach (var stat in stats)
+            {
+                if (stat.Value > 2) // More than 2 factions with same def
+                {
+                    ModCore.LogDebug("Found " + stat.Value + " factions using def " + stat.Key);
+                    needsConsolidation = true;
+                }
+            }
+
+            if (needsConsolidation)
+            {
+                Log.Message("[" + ModCore.ModId + "] Consolidating duplicate factions...");
+                FactionDefManager.ConsolidateDuplicateFactions(2); // Max 2 per def
+            }
         }
 
         private static bool ValidateWorld()
@@ -136,7 +164,7 @@ namespace LemProgress.Systems
             int count = 0;
             foreach (var faction in Find.World.factionManager.AllFactions)
             {
-                if (faction.def.techLevel == TechLevel.Ultra && !faction.def.isPlayer)
+                if (faction.def.techLevel == TechLevel.Ultra)
                     count++;
             }
             return count;

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LemProgress.Systems.LemProgress.Systems;
 using Verse;
 
 namespace LemProgress.Systems
@@ -30,6 +31,14 @@ namespace LemProgress.Systems
             try
             {
                 var settings = ModCore.Settings;
+
+                // Ensure this faction has a unique def before modifying
+                var uniqueDef = FactionDefManager.EnsureUniqueDef(faction);
+                if (uniqueDef == null)
+                {
+                    Log.Error("[" + ModCore.ModId + "] Failed to ensure unique def for " + faction.Name);
+                    return false;
+                }
 
                 // Check if downgrade is allowed
                 if (originalDef.techLevel > targetLevel && !settings.allowDowngrades)

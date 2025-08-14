@@ -91,6 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\LemProgressSettings.cs" />
     <Compile Include="Systems\FactionDefCopier.cs" />
+    <Compile Include="Systems\FactionDefManager.cs" />
     <Compile Include="Systems\FactionUpgradeManager.cs" />
     <Compile Include="Systems\FactionUpgrader.cs" />
     <Compile Include="Systems\LemProgressMod.cs" />
