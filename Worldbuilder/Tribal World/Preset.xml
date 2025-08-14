@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<worldPreset>
+	<name>Tribal World</name>
+	<planetType>Tribal World</planetType>
+	<difficulty>3</difficulty>
+	<biomes IsNull="True" />
+	<landmarks IsNull="True" />
+	<features IsNull="True" />
+	<description>This planet type limits all technology to the Neolithic era and below.</description>
+	<saveWorldTechLevel>True</saveWorldTechLevel>
+	<savedScenParts>
+		<keys />
+		<values />
+	</savedScenParts>
+	<worldTechLevel>Neolithic</worldTechLevel>
+	<customizationDefaults>
+		<keys />
+		<values />
+	</customizationDefaults>
+	<factionSettlementCustomizationDefaults IsNull="True" />
+	<factionNameOverrides IsNull="True" />
+	<factionDescriptionOverrides IsNull="True" />
+	<presetStories />
+	<savedFactionDefs>
+		<li>Ancients</li>
+		<li>AncientsHostile</li>
+		<li>Mechanoid</li>
+		<li>Insect</li>
+		<li>Pirate</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>		
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+		<li>TribeCivil</li>
+		<li>TribeSavage</li>
+		<li>TribeRough</li>
+	</savedFactionDefs>
+	<savedSettlementsData IsNull="True" />
+	<savedMapMarkersData IsNull="True" />
+	<savedMapTextFeaturesData IsNull="True" />
+	<worldInfo IsNull="True" />
+</worldPreset>

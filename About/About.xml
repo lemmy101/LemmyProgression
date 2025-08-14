@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+
+<packageId>LemmyMods.LemProgression</packageId>
+<author>Lemmy</author>
+
+<description>Adds world progression to ferny's progression modpack (quests, pawns, factions etc)</description>
+
+<supportedVersions>
+  <li>1.6</li>
+</supportedVersions>
+<modDependencies>
+  <li>
+    <packageId>brrainz.harmony</packageId>
+    <displayName>Harmony</displayName>
+    <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+  </li>
+  <li>
+    <packageId>m00nl1ght.WorldTechLevel</packageId>
+    <displayName>World Tech Level</displayName>
+    <steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3414187030</steamWorkshopUrl>
+  </li>
+</modDependencies>
+<loadAfter>
+    <li>m00nl1ght.WorldTechLevel</li>
+</loadAfter>
+
+</ModMetaData>
