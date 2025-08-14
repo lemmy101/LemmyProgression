@@ -1,0 +1,260 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\systems\\factionupgrader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:systems\\factionupgrader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\systems\\worlderamanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:systems\\worlderamanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|Source||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\patches\\vfetribalspatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:patches\\vfetribalspatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\patches\\worldtechlevelpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:patches\\worldtechlevelpatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\systems\\factionupgrademanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:systems\\factionupgrademanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\systems\\lemprogressmod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:systems\\lemprogressmod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\settings\\lemprogresssettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:settings\\lemprogresssettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\patches\\nullpawngroupmakerfix.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:patches\\nullpawngroupmakerfix.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\patches\\debuggetoptionspatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:patches\\debuggetoptionspatch.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\systems\\factiondefanalyser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:systems\\factiondefanalyser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\modcore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:modcore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\patches\\patchmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|solutionrelative:patches\\patchmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F46AF7DD-D3AD-42F7-9DAD-78C332FA2EB6}|Source.csproj|d:\\steamlibrary\\steamapps\\common\\rimworld\\mods\\lemmyprogression\\source\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|a54ad834-9219-4aa6-b589-607af21c3e26"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "NullPawnGroupMakerFix.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\NullPawnGroupMakerFix.cs",
+              "RelativeDocumentMoniker": "Patches\\NullPawnGroupMakerFix.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\NullPawnGroupMakerFix.cs",
+              "RelativeToolTip": "Patches\\NullPawnGroupMakerFix.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T16:55:53.81Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DebugGetOptionsPatch.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\DebugGetOptionsPatch.cs",
+              "RelativeDocumentMoniker": "Patches\\DebugGetOptionsPatch.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\DebugGetOptionsPatch.cs",
+              "RelativeToolTip": "Patches\\DebugGetOptionsPatch.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T15:04:10.683Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LemProgressMod.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\LemProgressMod.cs",
+              "RelativeDocumentMoniker": "Systems\\LemProgressMod.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\LemProgressMod.cs",
+              "RelativeToolTip": "Systems\\LemProgressMod.cs",
+              "ViewState": "AgIAAGUAAAAAAAAAAAAYwHcAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:16:26.059Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FactionUpgrader.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\FactionUpgrader.cs",
+              "RelativeDocumentMoniker": "Systems\\FactionUpgrader.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\FactionUpgrader.cs",
+              "RelativeToolTip": "Systems\\FactionUpgrader.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:15:45.882Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FactionUpgradeManager.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\FactionUpgradeManager.cs",
+              "RelativeDocumentMoniker": "Systems\\FactionUpgradeManager.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\FactionUpgradeManager.cs",
+              "RelativeToolTip": "Systems\\FactionUpgradeManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAowBAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:15:27.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "WorldEraManager.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\WorldEraManager.cs",
+              "RelativeDocumentMoniker": "Systems\\WorldEraManager.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\WorldEraManager.cs",
+              "RelativeToolTip": "Systems\\WorldEraManager.cs",
+              "ViewState": "AgIAAG4AAAAAAAAAAAAawIUAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:15:06.387Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "VFETribalsPatch.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\VFETribalsPatch.cs",
+              "RelativeDocumentMoniker": "Patches\\VFETribalsPatch.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\VFETribalsPatch.cs",
+              "RelativeToolTip": "Patches\\VFETribalsPatch.cs",
+              "ViewState": "AgIAAJcAAAAAAAAAAAAqwLUAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:14:40.9Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "WorldTechLevelPatch.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\WorldTechLevelPatch.cs",
+              "RelativeDocumentMoniker": "Patches\\WorldTechLevelPatch.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\WorldTechLevelPatch.cs",
+              "RelativeToolTip": "Patches\\WorldTechLevelPatch.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:14:23.899Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "LemProgressSettings.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Settings\\LemProgressSettings.cs",
+              "RelativeDocumentMoniker": "Settings\\LemProgressSettings.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Settings\\LemProgressSettings.cs",
+              "RelativeToolTip": "Settings\\LemProgressSettings.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:17:16.929Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Source",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Source.csproj",
+              "RelativeDocumentMoniker": "Source.csproj",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Source.csproj",
+              "RelativeToolTip": "Source.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-13T14:19:35.74Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "FactionDefAnalyser.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\FactionDefAnalyser.cs",
+              "RelativeDocumentMoniker": "Systems\\FactionDefAnalyser.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Systems\\FactionDefAnalyser.cs",
+              "RelativeToolTip": "Systems\\FactionDefAnalyser.cs",
+              "ViewState": "AgIAAHgBAAAAAAAAAAAowJwBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T15:41:42.814Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d84ee353-0bef-5a41-a649-8f89aca5d84d}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "PatchManager.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\PatchManager.cs",
+              "RelativeDocumentMoniker": "Patches\\PatchManager.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\Patches\\PatchManager.cs",
+              "RelativeToolTip": "Patches\\PatchManager.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAzwB0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:14:01.02Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ModCore.cs",
+              "DocumentMoniker": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\ModCore.cs",
+              "RelativeDocumentMoniker": "ModCore.cs",
+              "ToolTip": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\LemmyProgression\\Source\\ModCore.cs",
+              "RelativeToolTip": "ModCore.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAmwCsAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-14T12:13:33.86Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Microsoft.Common.CurrentVersion.targets",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ViewState": "AgIAAGYJAAAAAAAAAAASwIwJAABRAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-08-13T17:07:36.646Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

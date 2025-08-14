@@ -1,0 +1,6 @@
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\LemmyProgression\Assemblies\LemProgress.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\LemmyProgression\Assemblies\LemProgress.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\LemmyProgression\Source\obj\x64\Release\Source.csproj.AssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\LemmyProgression\Source\obj\x64\Release\Source.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\LemmyProgression\Source\obj\x64\Release\LemProgress.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\LemmyProgression\Source\obj\x64\Release\LemProgress.pdb
