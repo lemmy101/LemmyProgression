@@ -120,6 +120,13 @@ namespace LemProgress.Patches
 
         private static bool ResearchFilterPrefix(ref TechLevel __result)
         {
+            var settings = ModCore.Settings;
+
+            if (!settings.modEnabled)
+            {
+                return true;
+            }
+
             __result = TechLevel.Archotech;
             return false;
         }
