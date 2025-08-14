@@ -15,6 +15,13 @@ namespace LemProgress.Systems
         {
             var settings = ModCore.Settings;
 
+            // Check if mod is enabled
+            if (!settings.modEnabled)
+            {
+                ModCore.LogDebug("Mod is disabled, skipping faction upgrades");
+                return;
+            }
+
             if (!settings.IsTechLevelUpgradeEnabled(newLevel))
             {
                 ModCore.LogDebug("Upgrades to " + newLevel.ToString() + " are disabled in settings");
@@ -25,13 +32,6 @@ namespace LemProgress.Systems
 
             // Get factions that are eligible for upgrade
             var factionsToUpgrade = GetUpgradeableFactions(oldLevel, newLevel);
-
-            // If configured, ensure each faction has a unique def before upgrading
-            if (settings.ensureUniqueFactionDefs)
-            {
-                Log.Message("[" + ModCore.ModId + "] Ensuring unique defs for " + factionsToUpgrade.Count + " factions");
-                FactionDefManager.EnsureUniqueDefsForUpgrade(factionsToUpgrade);
-            }
 
             var upgradeCount = 0;
             var ultraCount = CountUltraTechFactions();
@@ -69,8 +69,7 @@ namespace LemProgress.Systems
                 }
 
                 // Check if faction def is allowed
-                var originalDefName = FactionDefManager.GetOriginalDefNameForFaction(faction);
-                if (!settings.IsFactionDefAllowed(originalDefName))
+                if (!settings.IsFactionDefAllowed(faction.def.defName))
                 {
                     ModCore.LogDebug("Faction " + faction.Name + " is filtered out");
                     continue;
@@ -110,9 +109,6 @@ namespace LemProgress.Systems
             }
 
             Log.Message("[" + ModCore.ModId + "] Upgraded " + upgradeCount + " factions");
-
-            // Clean up any orphaned references (but don't remove factions)
-            FactionDefManager.CleanupRemovedFactions();
         }
 
         private static bool ValidateWorld()
@@ -160,9 +156,8 @@ namespace LemProgress.Systems
                         continue;
                 }
 
-                // Check if faction def is allowed (use original def name for filtering)
-                var originalDefName = FactionDefManager.GetOriginalDefNameForFaction(faction);
-                if (!settings.IsFactionDefAllowed(originalDefName))
+                // Check if faction def is allowed
+                if (!settings.IsFactionDefAllowed(faction.def.defName))
                 {
                     ModCore.LogDebug("Faction " + faction.Name + " excluded by filter");
                     continue;
