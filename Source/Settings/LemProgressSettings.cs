@@ -12,6 +12,7 @@ namespace LemProgress.Settings
         public int maxUltraFactions = 1;
         public bool onlyUpgradeOneStepAtTime = false;
         public bool preferSimilarFactionTypes = true;
+        public int maxTechLevelsBehindToUpgrade = 4; // How many levels behind can still upgrade
 
         // Preservation Settings
         public bool preserveFactionNames = true;
@@ -38,6 +39,9 @@ namespace LemProgress.Settings
             { "Archotech", false }
         };
 
+        // Faction Management Settings
+        public bool ensureUniqueFactionDefs = true;
+
         // Filter Settings
         public List<string> blacklistedFactionDefs = new List<string>();
         public List<string> whitelistedFactionDefs = new List<string>();
@@ -49,6 +53,7 @@ namespace LemProgress.Settings
             Scribe_Values.Look(ref maxUltraFactions, "maxUltraFactions", 1);
             Scribe_Values.Look(ref onlyUpgradeOneStepAtTime, "onlyUpgradeOneStepAtTime", false);
             Scribe_Values.Look(ref preferSimilarFactionTypes, "preferSimilarFactionTypes", true);
+            Scribe_Values.Look(ref maxTechLevelsBehindToUpgrade, "maxTechLevelsBehindToUpgrade", 2);
 
             // Preservation settings
             Scribe_Values.Look(ref preserveFactionNames, "preserveFactionNames", true);
@@ -65,6 +70,9 @@ namespace LemProgress.Settings
             // Advanced settings
             Scribe_Values.Look(ref debugLogging, "debugLogging", false);
             Scribe_Values.Look(ref autoUpgradePlayerFaction, "autoUpgradePlayerFaction", false);
+
+            // Faction management settings
+            Scribe_Values.Look(ref ensureUniqueFactionDefs, "ensureUniqueFactionDefs", true);
 
             // Collections
             Scribe_Collections.Look(ref techLevelUpgradeEnabled, "techLevelUpgradeEnabled",
@@ -112,11 +120,27 @@ namespace LemProgress.Settings
 
         public bool IsFactionDefAllowed(string defName)
         {
-            if (whitelistedFactionDefs.Count > 0)
+            // Strip our unique suffix if present to check against original def name
+            var originalDefName = defName;
+            if (defName.Contains("_LemProg_"))
             {
-                return whitelistedFactionDefs.Contains(defName);
+                originalDefName = defName.Substring(0, defName.IndexOf("_LemProg_"));
             }
-            return !blacklistedFactionDefs.Contains(defName);
+
+            // If we have a whitelist, only allow those
+            if (whitelistedFactionDefs != null && whitelistedFactionDefs.Count > 0)
+            {
+                return whitelistedFactionDefs.Contains(originalDefName);
+            }
+
+            // Otherwise, check blacklist
+            if (blacklistedFactionDefs != null && blacklistedFactionDefs.Contains(originalDefName))
+            {
+                return false;
+            }
+
+            // Default to allowed
+            return true;
         }
 
         public void ResetToDefaults()

@@ -4,9 +4,7 @@ using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LemProgress.Systems.LemProgress.Systems;
+using System.Reflection;
 using Verse;
 
 namespace LemProgress.Systems
@@ -23,7 +21,11 @@ namespace LemProgress.Systems
                 throw new ArgumentNullException("faction");
 
             this.faction = faction;
+            // Store the current def, which might already be a unique copy
             this.originalDef = faction.def;
+
+            ModCore.LogDebug("FactionUpgrader initialized for " + faction.Name +
+                " with def " + faction.def.defName + " at tech level " + faction.def.techLevel.ToString());
         }
 
         public bool UpgradeToTechLevel(TechLevel targetLevel)
@@ -74,27 +76,92 @@ namespace LemProgress.Systems
             var settings = ModCore.Settings;
             var candidates = new List<FactionDef>();
 
+            ModCore.LogDebug("Searching for faction defs at tech level: " + techLevel.ToString());
+
             foreach (var def in DefDatabase<FactionDef>.AllDefs)
             {
-                if (def.techLevel != techLevel)
+                // Skip our unique copies - we want original defs as templates
+                if (def.defName.Contains("_LemProg_"))
+                {
+                    ModCore.LogDebug("  Skipping unique copy: " + def.defName);
                     continue;
+                }
+
+                if (def.techLevel != techLevel)
+                {
+                    ModCore.LogDebug("  " + def.defName + " wrong tech level: " + def.techLevel.ToString());
+                    continue;
+                }
 
                 if (!def.humanlikeFaction)
+                {
+                    ModCore.LogDebug("  " + def.defName + " not humanlike");
                     continue;
+                }
 
                 if (def.isPlayer)
+                {
+                    ModCore.LogDebug("  " + def.defName + " is player faction");
                     continue;
+                }
 
                 if (def.hidden)
+                {
+                    ModCore.LogDebug("  " + def.defName + " is hidden");
                     continue;
+                }
 
-                if (!settings.IsFactionDefAllowed(def.defName))
+                // Check against original def name for filtering
+                var originalDefName = FactionDefManager.GetOriginalDefName(def);
+                if (!settings.IsFactionDefAllowed(originalDefName))
+                {
+                    ModCore.LogDebug("  " + def.defName + " is blacklisted");
                     continue;
+                }
 
                 if (settings.preferSimilarFactionTypes && !IsCompatibleFactionType(def))
+                {
+                    ModCore.LogDebug("  " + def.defName + " not compatible type");
                     continue;
+                }
 
+                ModCore.LogDebug("  Adding candidate: " + def.defName);
                 candidates.Add(def);
+            }
+
+            ModCore.LogDebug("Found " + candidates.Count + " candidate faction defs for " + techLevel.ToString());
+
+            // If no candidates found with similarity preference, try without it
+            if (candidates.Count == 0 && settings.preferSimilarFactionTypes)
+            {
+                ModCore.LogDebug("No compatible types found, trying without similarity filter...");
+
+                foreach (var def in DefDatabase<FactionDef>.AllDefs)
+                {
+                    // Skip our unique copies
+                    if (def.defName.Contains("_LemProg_"))
+                        continue;
+
+                    if (def.techLevel != techLevel)
+                        continue;
+
+                    if (!def.humanlikeFaction)
+                        continue;
+
+                    if (def.isPlayer)
+                        continue;
+
+                    if (def.hidden)
+                        continue;
+
+                    var originalDefName = FactionDefManager.GetOriginalDefName(def);
+                    if (!settings.IsFactionDefAllowed(originalDefName))
+                        continue;
+
+                    candidates.Add(def);
+                }
+
+                ModCore.LogDebug("Found " + candidates.Count + " candidates without similarity filter");
             }
 
             return candidates;
@@ -102,23 +169,48 @@ namespace LemProgress.Systems
 
         private bool IsCompatibleFactionType(FactionDef candidate)
         {
+            // Get the original def name for comparison (strip _LemProg_ suffix if present)
+            var originalDefName = FactionDefManager.GetOriginalDefName(originalDef);
+            var candidateDefName = FactionDefManager.GetOriginalDefName(candidate);
+
             // Prefer same category
             if (originalDef.categoryTag != null && candidate.categoryTag == originalDef.categoryTag)
+            {
+                ModCore.LogDebug("    Compatible: same category tag");
                 return true;
+            }
 
             // Check hostility compatibility
             if (originalDef.permanentEnemy != candidate.permanentEnemy)
-                return false;
-
-            // Check for similar keywords in def names
-            string[] keywords = new string[] { "Tribe", "Pirate", "Civil", "Empire", "Rough", "Gentle", "Savage" };
-            foreach (var keyword in keywords)
             {
-                if (originalDef.defName.Contains(keyword) && candidate.defName.Contains(keyword))
-                    return true;
+                ModCore.LogDebug("    Not compatible: different enemy status");
+                return false;
             }
 
-            return true;
+            // Check for similar keywords in original def names
+            string[] keywords = new string[] { "Tribe", "Pirate", "Civil", "Empire", "Rough", "Gentle", "Savage", "Outlander" };
+            foreach (var keyword in keywords)
+            {
+                if (originalDefName.Contains(keyword) && candidateDefName.Contains(keyword))
+                {
+                    ModCore.LogDebug("    Compatible: both contain keyword " + keyword);
+                    return true;
+                }
+            }
+
+            // Check for mod source similarity
+            string[] originalParts = originalDefName.Split('_');
+            string[] candidateParts = candidateDefName.Split('_');
+
+            if (originalParts.Length > 0 && candidateParts.Length > 0 &&
+                originalParts[0] == candidateParts[0])
+            {
+                ModCore.LogDebug("    Compatible: same mod prefix");
+                return true;
+            }
+
+            ModCore.LogDebug("    Not compatible: no matching criteria");
+            return false;
         }
 
         private FactionDef SelectBestCandidate(List<FactionDef> candidates)

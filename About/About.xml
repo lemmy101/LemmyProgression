@@ -24,11 +24,17 @@
     <packageId>oskarpotocki.vfe.tribals</packageId>
     <displayName>Vanilla Factions Expanded - Tribals</displayName>
     <steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3079786283</steamWorkshopUrl>
+  </li>  <li>
+    <packageId>dankpyon.medieval.overhaul</packageId>
+    <displayName>Medieval Overhaul</displayName>
+    <steamWorkshopUrl>https://steamcommunity.com/sharedfiles/filedetails/?id=3219596926</steamWorkshopUrl>
   </li>
 </modDependencies>
 <loadAfter>
     <li>m00nl1ght.WorldTechLevel</li>
     <li>oskarpotocki.vfe.tribals</li>
+    <li>ferny.worldbuilder</li>
+    <li>dankpyon.medieval.overhaul</li>
 </loadAfter>
 
 </ModMetaData>

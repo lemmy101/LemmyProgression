@@ -1,10 +1,8 @@
 ﻿using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LemProgress.Systems.LemProgress.Systems;
 using Verse;
 
 namespace LemProgress.Systems
@@ -25,40 +23,69 @@ namespace LemProgress.Systems
 
             if (!ValidateWorld()) return;
 
-            // First, consolidate duplicate factions if needed
-            ConsolidateDuplicateFactionsIfNeeded();
-
+            // Get factions that are eligible for upgrade
             var factionsToUpgrade = GetUpgradeableFactions(oldLevel, newLevel);
+
+            // If configured, ensure each faction has a unique def before upgrading
+            if (settings.ensureUniqueFactionDefs)
+            {
+                Log.Message("[" + ModCore.ModId + "] Ensuring unique defs for " + factionsToUpgrade.Count + " factions");
+                FactionDefManager.EnsureUniqueDefsForUpgrade(factionsToUpgrade);
+            }
+
             var upgradeCount = 0;
             var ultraCount = CountUltraTechFactions();
 
             foreach (var faction in factionsToUpgrade)
             {
+                // Determine the target tech level for this faction
+                TechLevel targetLevel;
+
+                if (settings.onlyUpgradeOneStepAtTime)
+                {
+                    // Always upgrade one step from current level
+                    targetLevel = GetNextTechLevel(faction.def.techLevel);
+                }
+                else
+                {
+                    // For factions at the old level (one step behind), upgrade to new level
+                    // For factions further behind, upgrade them one step
+                    if (faction.def.techLevel == oldLevel)
+                    {
+                        targetLevel = newLevel;
+                    }
+                    else
+                    {
+                        targetLevel = GetNextTechLevel(faction.def.techLevel);
+                    }
+                }
+
                 // Check Ultra faction limit
-                if (newLevel == TechLevel.Ultra &&
+                if (targetLevel == TechLevel.Ultra &&
                     ultraCount >= settings.maxUltraFactions)
                 {
                     ModCore.LogDebug("Reached max Ultra factions limit (" + settings.maxUltraFactions + ")");
-                    break;
+                    continue;
                 }
 
                 // Check if faction def is allowed
-                if (!settings.IsFactionDefAllowed(faction.def.defName))
+                var originalDefName = FactionDefManager.GetOriginalDefNameForFaction(faction);
+                if (!settings.IsFactionDefAllowed(originalDefName))
                 {
                     ModCore.LogDebug("Faction " + faction.Name + " is filtered out");
                     continue;
                 }
 
-                if (ShouldUpgradeFaction(faction, newLevel))
+                // Roll the dice for this faction
+                if (ShouldUpgradeFaction(faction, targetLevel))
                 {
-                    var targetLevel = settings.onlyUpgradeOneStepAtTime
-                        ? GetNextTechLevel(faction.def.techLevel)
-                        : newLevel;
-
                     if (targetLevel <= faction.def.techLevel && !settings.allowDowngrades)
                     {
                         continue;
                     }
+
+                    ModCore.LogDebug("Upgrading " + faction.Name + " from " +
+                        faction.def.techLevel.ToString() + " to " + targetLevel.ToString());
 
                     var upgrader = new FactionUpgrader(faction);
                     if (upgrader.UpgradeToTechLevel(targetLevel))
@@ -82,31 +109,10 @@ namespace LemProgress.Systems
                 }
             }
 
-            Log.Message("[" + ModCore.ModId + "] Upgraded " + upgradeCount + " factions to " + newLevel.ToString());
+            Log.Message("[" + ModCore.ModId + "] Upgraded " + upgradeCount + " factions");
 
-            // Clean up after upgrades
+            // Clean up any orphaned references (but don't remove factions)
             FactionDefManager.CleanupRemovedFactions();
-        }
-
-        private static void ConsolidateDuplicateFactionsIfNeeded()
-        {
-            var stats = FactionDefManager.GetDefUsageStats();
-            bool needsConsolidation = false;
-
-            foreach (var stat in stats)
-            {
-                if (stat.Value > 2) // More than 2 factions with same def
-                {
-                    ModCore.LogDebug("Found " + stat.Value + " factions using def " + stat.Key);
-                    needsConsolidation = true;
-                }
-            }
-
-            if (needsConsolidation)
-            {
-                Log.Message("[" + ModCore.ModId + "] Consolidating duplicate factions...");
-                FactionDefManager.ConsolidateDuplicateFactions(2); // Max 2 per def
-            }
         }
 
         private static bool ValidateWorld()
@@ -127,15 +133,7 @@ namespace LemProgress.Systems
 
             foreach (var faction in Find.World.factionManager.AllFactions)
             {
-                // Check tech level requirements
-                if (settings.onlyUpgradeOneStepAtTime && faction.def.techLevel != oldLevel)
-                    continue;
-
-                if (!settings.onlyUpgradeOneStepAtTime &&
-                    faction.def.techLevel >= newLevel && !settings.allowDowngrades)
-                    continue;
-
-                // Check if player faction upgrade is allowed
+                // Skip player faction unless allowed
                 if (faction.IsPlayer && !settings.autoUpgradePlayerFaction)
                     continue;
 
@@ -143,11 +141,50 @@ namespace LemProgress.Systems
                 if (!faction.def.humanlikeFaction)
                     continue;
 
-                // Check if faction def is allowed
-                if (!settings.IsFactionDefAllowed(faction.def.defName))
+                // Check current tech level
+                var currentTechLevel = faction.def.techLevel;
+
+                if (settings.onlyUpgradeOneStepAtTime)
+                {
+                    // In one-step mode, include all factions below the new level
+                    if (currentTechLevel >= newLevel && !settings.allowDowngrades)
+                        continue;
+                }
+                else
+                {
+                    // In normal mode:
+                    // - Factions at oldLevel (one step behind) can upgrade to newLevel
+                    // - Factions below oldLevel can upgrade one step
+                    // - Skip factions already at or above newLevel (unless downgrades allowed)
+                    if (currentTechLevel >= newLevel && !settings.allowDowngrades)
+                        continue;
+                }
+
+                // Check if faction def is allowed (use original def name for filtering)
+                var originalDefName = FactionDefManager.GetOriginalDefNameForFaction(faction);
+                if (!settings.IsFactionDefAllowed(originalDefName))
+                {
+                    ModCore.LogDebug("Faction " + faction.Name + " excluded by filter");
                     continue;
+                }
 
                 factions.Add(faction);
+            }
+
+            ModCore.LogDebug("Found " + factions.Count + " factions eligible for upgrade consideration");
+
+            // Log the breakdown by tech level
+            var techLevelCounts = new Dictionary<TechLevel, int>();
+            foreach (var faction in factions)
+            {
+                if (!techLevelCounts.ContainsKey(faction.def.techLevel))
+                    techLevelCounts[faction.def.techLevel] = 0;
+                techLevelCounts[faction.def.techLevel]++;
+            }
+
+            foreach (var kvp in techLevelCounts)
+            {
+                ModCore.LogDebug("  - " + kvp.Value + " factions at " + kvp.Key.ToString());
             }
 
             return factions;

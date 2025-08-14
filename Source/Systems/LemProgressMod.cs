@@ -3,13 +3,10 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LemProgress.Settings;
 using UnityEngine;
 using Verse;
 
-namespace LemProgress.Systems
+namespace LemProgress.Settings
 {
     public class LemProgressMod : Mod
     {
@@ -135,6 +132,14 @@ namespace LemProgress.Systems
                 ref settings.preferSimilarFactionTypes,
                 "If checked, the mod will try to maintain faction identity when upgrading");
 
+            // Max tech levels behind
+            listing.Gap();
+            string levelsBehindLabel = "Max tech levels behind to upgrade: " + settings.maxTechLevelsBehindToUpgrade;
+            listing.Label(levelsBehindLabel);
+            listing.Label("Factions more than " + settings.maxTechLevelsBehindToUpgrade +
+                " levels behind won't be upgraded", -1f);
+            settings.maxTechLevelsBehindToUpgrade = (int)listing.Slider(settings.maxTechLevelsBehindToUpgrade, 1, 5);
+
             listing.CheckboxLabeled("Show notifications when factions upgrade",
                 ref settings.notifyOnFactionUpgrade,
                 "Display a message when a faction advances to a new tech level");
@@ -148,6 +153,14 @@ namespace LemProgress.Systems
             string delayLabel = "Settlement Upgrade Delay: " + settings.settlementUpgradeDelay.ToString("F0") + " days";
             listing.Label(delayLabel);
             settings.settlementUpgradeDelay = listing.Slider(settings.settlementUpgradeDelay, 0f, 60f);
+
+            // Faction management settings
+            listing.Gap();
+            listing.Label("Faction Management:");
+
+            listing.CheckboxLabeled("Ensure unique faction defs",
+                ref settings.ensureUniqueFactionDefs,
+                "Each faction gets its own def instance to prevent shared upgrades when multiple factions use the same base def");
 
             listing.End();
         }
@@ -364,6 +377,26 @@ namespace LemProgress.Systems
                 {
                     ForceRefreshAllFactions();
                 }
+
+                if (listing.ButtonText("Show Faction Def Usage"))
+                {
+                    ShowFactionDefUsage();
+                }
+
+                if (listing.ButtonText("Ensure Unique Faction Defs"))
+                {
+                    EnsureAllFactionsHaveUniqueDefs();
+                }
+
+                if (listing.ButtonText("Validate Def Uniqueness"))
+                {
+                    ValidateDefUniqueness();
+                }
+
+                if (listing.ButtonText("List Available Faction Defs"))
+                {
+                    ListAvailableFactionDefs();
+                }
             }
             else
             {
@@ -464,6 +497,107 @@ namespace LemProgress.Systems
             }
 
             Messages.Message("Force refreshed all faction pawn generation", MessageTypeDefOf.NeutralEvent);
+        }
+
+        private void ShowFactionDefUsage()
+        {
+            if (Find.World == null || Find.World.factionManager == null) return;
+
+            var stats = Systems.FactionDefManager.GetDefUsageStats();
+
+            Log.Message("=== Faction Def Usage ===");
+            foreach (var stat in stats.OrderByDescending(s => s.Value.TotalCount))
+            {
+                Log.Message("Original Def: " + stat.Key + " - " + stat.Value.TotalCount + " faction(s)");
+                foreach (var faction in stat.Value.Factions)
+                {
+                    string uniqueStatus = faction.IsUnique ? " [UNIQUE]" : " [SHARED]";
+                    Log.Message("  - " + faction.Name + " (" + faction.CurrentDefName + ")" + uniqueStatus);
+                }
+            }
+
+            Messages.Message("Faction def usage logged to console", MessageTypeDefOf.NeutralEvent);
+        }
+
+        private void EnsureAllFactionsHaveUniqueDefs()
+        {
+            if (Find.World == null || Find.World.factionManager == null) return;
+
+            int count = 0;
+            var factionsToMakeUnique = new List<Faction>();
+
+            foreach (var faction in Find.World.factionManager.AllFactions)
+            {
+                if (!faction.IsPlayer)
+                {
+                    factionsToMakeUnique.Add(faction);
+                }
+            }
+
+            Systems.FactionDefManager.EnsureUniqueDefsForUpgrade(factionsToMakeUnique);
+
+            Messages.Message("Ensured " + factionsToMakeUnique.Count + " factions have unique defs",
+                MessageTypeDefOf.NeutralEvent);
+        }
+
+        private void ValidateDefUniqueness()
+        {
+            if (Find.World == null || Find.World.factionManager == null) return;
+
+            var stats = Systems.FactionDefManager.GetDefUsageStats();
+            int sharedDefs = 0;
+            int uniqueDefs = 0;
+
+            foreach (var stat in stats)
+            {
+                foreach (var faction in stat.Value.Factions)
+                {
+                    if (faction.IsUnique)
+                        uniqueDefs++;
+                    else
+                        sharedDefs++;
+                }
+            }
+
+            string message = "Def Status: " + uniqueDefs + " unique, " + sharedDefs + " shared";
+            Messages.Message(message, MessageTypeDefOf.NeutralEvent);
+            Log.Message("[" + ModCore.ModId + "] " + message);
+        }
+
+        private void ListAvailableFactionDefs()
+        {
+            Log.Message("=== Available Faction Defs by Tech Level ===");
+
+            var techLevels = Enum.GetValues(typeof(TechLevel)).Cast<TechLevel>();
+
+            foreach (var techLevel in techLevels)
+            {
+                var defsAtLevel = new List<FactionDef>();
+
+                foreach (var def in DefDatabase<FactionDef>.AllDefs)
+                {
+                    if (def.techLevel == techLevel &&
+                        def.humanlikeFaction &&
+                        !def.isPlayer &&
+                        !def.hidden &&
+                        !def.defName.Contains("_LemProg_")) // Skip our unique copies
+                    {
+                        defsAtLevel.Add(def);
+                    }
+                }
+
+                if (defsAtLevel.Count > 0)
+                {
+                    Log.Message(techLevel.ToString() + ": " + defsAtLevel.Count + " defs");
+                    foreach (var def in defsAtLevel)
+                    {
+                        string blacklisted = settings.IsFactionDefAllowed(def.defName) ? "" : " [BLACKLISTED]";
+                        Log.Message("  - " + def.defName + " (" + def.label + ")" + blacklisted);
+                    }
+                }
+            }
+
+            Messages.Message("Available faction defs listed in console", MessageTypeDefOf.NeutralEvent);
         }
     }
 }
