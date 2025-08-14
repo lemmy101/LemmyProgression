@@ -22,6 +22,23 @@ namespace LemProgress.Systems
                 return;
             }
 
+            Log.Message("[" + ModCore.ModId + "] === STARTING FACTION UPGRADE PROCESS ===");
+            Log.Message("[" + ModCore.ModId + "] Upgrading from " + oldLevel.ToString() + " to " + newLevel.ToString());
+
+            // Analyze available faction defs at this tech level before starting
+            Log.Message("[" + ModCore.ModId + "] Analyzing available faction defs at target level " + newLevel.ToString() + ":");
+            var availableDefs = DefDatabase<FactionDef>.AllDefs.Where(def =>
+                def.techLevel == newLevel &&
+                def.humanlikeFaction &&
+                !def.isPlayer &&
+                !def.hidden).ToList();
+
+            Log.Message("[" + ModCore.ModId + "] Found " + availableDefs.Count + " potential target defs");
+            foreach (var def in availableDefs.Take(5)) // Log first 5
+            {
+                Systems.FactionDefAnalyzer.AnalyzeFactionDefAtUpgradeTime(def, "AVAILABLE-TARGET");
+            }
+
             if (!settings.IsTechLevelUpgradeEnabled(newLevel))
             {
                 ModCore.LogDebug("Upgrades to " + newLevel.ToString() + " are disabled in settings");

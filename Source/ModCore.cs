@@ -36,6 +36,9 @@ namespace LemProgress
             // Initialize systems in order
             PatchManager.Initialize(harmony);
 
+            // The FactionDefAnalyzer runs automatically via [StaticConstructorOnStartup]
+            // It will queue itself to run after all defs are loaded
+
             if (Settings != null && Settings.debugLogging)
             {
                 Log.Message("[" + ModId + "] Debug logging enabled");

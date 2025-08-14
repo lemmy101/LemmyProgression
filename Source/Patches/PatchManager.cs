@@ -25,7 +25,7 @@ namespace LemProgress.Patches
         private static void ApplyAttributePatches(Harmony harmony)
         {
             harmony.PatchAll();
-            Log.Message("[" + ModCore.ModId + "] Applied attribute-based patches");
+            Log.Message("[" + ModCore.ModId + "] Applied attribute-based patches (including debug patches)");
         }
 
         private static void ApplyRuntimePatches()

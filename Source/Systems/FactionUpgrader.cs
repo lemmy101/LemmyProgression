@@ -47,26 +47,37 @@ namespace LemProgress.Systems
                     return false;
                 }
 
-                var selectedDef = SelectBestCandidate(candidateDefs);
-
-                // Validate the selected def before applying it
-                if (!ValidateFactionDef(selectedDef))
+                ModCore.LogDebug("=== ANALYZING CANDIDATE DEFS ===");
+                foreach (var candidate in candidateDefs.Take(3)) // Log first 3 candidates
                 {
-                    Log.Warning("[" + ModCore.ModId + "] Selected faction def " + selectedDef.defName +
-                        " failed validation, upgrade cancelled for " + faction.Name);
-                    return false;
+                    FactionDefAnalyzer.AnalyzeFactionDefAtUpgradeTime(candidate, "CANDIDATE");
                 }
 
-                // Simple def swap - RimWorld handles all the persistence
+                var selectedDef = SelectBestCandidate(candidateDefs);
+
+                ModCore.LogDebug("=== SELECTED DEF ANALYSIS ===");
+                FactionDefAnalyzer.AnalyzeFactionDefAtUpgradeTime(selectedDef, "SELECTED FOR UPGRADE");
+
+                // Store old def info for logging and potential rollback
+                var oldDef = faction.def;
                 var oldDefName = faction.def.defName;
+                var oldTechLevel = faction.def.techLevel;
+
+                ModCore.LogDebug("=== BEFORE DEF SWAP ===");
+                FactionDefAnalyzer.CompareFactionDefStates(selectedDef, "before-swap", "selected-def");
+
+                // Simple def swap - RimWorld handles all the persistence
                 faction.def = selectedDef;
 
+                ModCore.LogDebug("=== AFTER DEF SWAP ===");
+                FactionDefAnalyzer.AnalyzeFactionDefAtUpgradeTime(faction.def, "POST-SWAP");
+
                 // Clear any cached data that might reference the old def
-                ClearPawnGenerationCaches();
+            //    ClearPawnGenerationCaches();
                 UpdateFactionAssets();
 
                 ModCore.LogDebug("Upgraded " + faction.Name + " from " +
-                    originalDef.techLevel.ToString() + " (" + oldDefName + ") to " +
+                    oldTechLevel.ToString() + " (" + oldDefName + ") to " +
                     targetLevel.ToString() + " (" + selectedDef.defName + ")");
                 return true;
             }
@@ -79,6 +90,11 @@ namespace LemProgress.Systems
 
         private bool ValidateFactionDef(FactionDef def)
         {
+            ModCore.LogDebug("=== VALIDATING FACTION DEF AT UPGRADE TIME ===");
+
+            // Run real-time analysis to compare with startup
+            FactionDefAnalyzer.AnalyzeFactionDefAtUpgradeTime(def, "PRE-UPGRADE VALIDATION");
+
             if (def == null)
             {
                 ModCore.LogDebug("Faction def is null");
@@ -97,31 +113,161 @@ namespace LemProgress.Systems
                 return false;
             }
 
-            // Check if at least one pawn group maker has viable options
+            // CRITICAL: Check each pawn group maker thoroughly
+            int validPawnGroupMakers = 0;
             foreach (var pgm in def.pawnGroupMakers)
             {
-                if (pgm == null) continue;
+                if (pgm == null)
+                {
+                    ModCore.LogDebug("Found null pawn group maker in " + def.defName);
+                    continue;
+                }
+
+                if (pgm.kindDef == null)
+                {
+                    ModCore.LogDebug("Pawn group maker has null kindDef in " + def.defName);
+                    continue;
+                }
+
+                // Check that the pawn generation lists have content
+                bool hasValidPawns = false;
+
+                if (pgm.guards != null && pgm.guards.Count > 0)
+                {
+                    ModCore.LogDebug("  PGM " + pgm.kindDef.defName + " has " + pgm.guards.Count + " guards");
+                    hasValidPawns = true;
+                }
+
+                if (pgm.carriers != null && pgm.carriers.Count > 0)
+                {
+                    ModCore.LogDebug("  PGM " + pgm.kindDef.defName + " has " + pgm.carriers.Count + " carriers");
+                    hasValidPawns = true;
+                }
+
+                if (pgm.traders != null && pgm.traders.Count > 0)
+                {
+                    ModCore.LogDebug("  PGM " + pgm.kindDef.defName + " has " + pgm.traders.Count + " traders");
+                    hasValidPawns = true;
+                }
+
+                if (!hasValidPawns)
+                {
+                    Log.Warning("[" + ModCore.ModId + "] Pawn group maker " + pgm.kindDef.defName +
+                        " in " + def.defName + " has no guards, carriers, or traders - this will cause null options");
+                    continue;
+                }
 
                 try
                 {
-                    // Try to access options - this will trigger generation
+                    // Try to access options safely - this will trigger generation
                     var options = pgm.options;
                     if (options != null && options.Count > 0)
                     {
-                        ModCore.LogDebug("Faction def " + def.defName + " validation passed");
-                        return true; // At least one working pawn group maker
+                        validPawnGroupMakers++;
+                        ModCore.LogDebug("  Valid pawn group maker: " + pgm.kindDef.defName + " with " + options.Count + " options");
+                    }
+                    else
+                    {
+                        Log.Warning("[" + ModCore.ModId + "] Pawn group maker " + pgm.kindDef.defName +
+                            " generated null or empty options despite having pawn lists");
                     }
                 }
                 catch (Exception e)
                 {
-                    ModCore.LogDebug("Pawn group maker validation failed: " + e.Message);
+                    Log.Warning("[" + ModCore.ModId + "] Pawn group maker options generation failed for " +
+                        def.defName + "." + pgm.kindDef.defName + ": " + e.Message);
                     continue;
                 }
             }
 
-            Log.Warning("[" + ModCore.ModId + "] Faction def " + def.defName +
-                " has no viable pawn group makers");
-            return false;
+            if (validPawnGroupMakers == 0)
+            {
+                Log.Warning("[" + ModCore.ModId + "] Faction def " + def.defName +
+                    " has no viable pawn group makers (checked " + def.pawnGroupMakers.Count + " total). " +
+                    "This def cannot be used for faction upgrades as it will cause raid generation to fail.");
+                return false;
+            }
+
+            ModCore.LogDebug("Faction def " + def.defName + " validation passed (" +
+                validPawnGroupMakers + "/" + def.pawnGroupMakers.Count + " viable pawn group makers)");
+            return true;
+        }
+
+        private bool ValidateFactionState()
+        {
+            try
+            {
+                if (faction == null)
+                {
+                    Log.Error("[" + ModCore.ModId + "] Faction is null after upgrade");
+                    return false;
+                }
+
+                if (faction.def == null)
+                {
+                    Log.Error("[" + ModCore.ModId + "] Faction def is null after upgrade");
+                    return false;
+                }
+
+                // Test that the faction can generate minimum raid points
+                if (faction.def.pawnGroupMakers != null)
+                {
+                    bool hasValidPawnGroupMaker = false;
+
+                    foreach (var pgm in faction.def.pawnGroupMakers)
+                    {
+                        if (pgm == null)
+                        {
+                            Log.Warning("[" + ModCore.ModId + "] Found null pawn group maker in " + faction.def.defName);
+                            continue;
+                        }
+
+                        try
+                        {
+                            // Ensure this pawn group maker is properly initialized
+                            EnsurePawnGroupMakerIntegrity(pgm);
+
+                            // Test basic pawn group functionality with more defensive approach
+                            var testParms = new PawnGroupMakerParms();
+                            testParms.faction = faction;
+                            testParms.points = 100f; // Small test value
+
+                            // Check if options are accessible
+                            var options = pgm.options;
+                            if (options == null)
+                            {
+                                Log.Warning("[" + ModCore.ModId + "] Pawn group maker has null options after integrity check");
+                                continue;
+                            }
+
+                            // This is the critical test - can it calculate minimum points without null reference?
+                            var minPoints = pgm.MinPointsToGenerateAnything(faction.def, testParms);
+                            ModCore.LogDebug("Pawn group maker " + pgm.kindDef?.defName + " min points: " + minPoints);
+                            hasValidPawnGroupMaker = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Warning("[" + ModCore.ModId + "] Pawn group maker failed validation test for " +
+                                faction.def.defName + ": " + e.Message);
+                            continue;
+                        }
+                    }
+
+                    if (!hasValidPawnGroupMaker)
+                    {
+                        Log.Error("[" + ModCore.ModId + "] No valid pawn group makers found for faction " + faction.Name);
+                        return false;
+                    }
+                }
+
+                ModCore.LogDebug("Faction state validation passed for " + faction.Name);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log.Error("[" + ModCore.ModId + "] Exception during faction state validation: " + e.ToString());
+                return false;
+            }
         }
 
         private List<FactionDef> GetCandidateFactionDefs(TechLevel techLevel)
@@ -208,44 +354,253 @@ namespace LemProgress.Systems
 
         private bool IsCompatibleFactionType(FactionDef candidate)
         {
-            // Prefer same category
-            if (originalDef.categoryTag != null && candidate.categoryTag == originalDef.categoryTag)
+            // If similarity preference is disabled, all factions are compatible
+            var settings = ModCore.Settings;
+            if (!settings.preferSimilarFactionTypes)
             {
-                ModCore.LogDebug("    Compatible: same category tag");
                 return true;
             }
 
-            // Check hostility compatibility
-            if (originalDef.permanentEnemy != candidate.permanentEnemy)
+            // Use a scoring system instead of hard requirements
+            int compatibilityScore = CalculateCompatibilityScore(candidate);
+
+            // Require at least some compatibility (score > 0) but be more lenient
+            bool isCompatible = compatibilityScore > 0;
+
+            ModCore.LogDebug("    Compatibility score for " + candidate.defName + ": " + compatibilityScore +
+                " (compatible: " + isCompatible + ")");
+
+            return isCompatible;
+        }
+
+        private int CalculateCompatibilityScore(FactionDef candidate)
+        {
+            int score = 0;
+
+            // High priority: Enemy status must match (this is important for gameplay)
+            if (originalDef.permanentEnemy == candidate.permanentEnemy)
             {
-                ModCore.LogDebug("    Not compatible: different enemy status");
-                return false;
+                score += 10;
+                ModCore.LogDebug("      +10 Same enemy status");
+            }
+            else
+            {
+                ModCore.LogDebug("      Enemy status mismatch - this is a major incompatibility");
+                return 0; // This is a hard requirement - pirates shouldn't become peaceful outlanders
             }
 
-            // Check for similar keywords in def names
+            // Medium priority: Category tags
+            if (originalDef.categoryTag != null && candidate.categoryTag == originalDef.categoryTag)
+            {
+                score += 5;
+                ModCore.LogDebug("      +5 Same category tag");
+            }
+
+            // Medium priority: Similar faction type keywords
             string[] keywords = new string[] { "Tribe", "Pirate", "Civil", "Empire", "Rough", "Gentle", "Savage", "Outlander" };
             foreach (var keyword in keywords)
             {
                 if (originalDef.defName.Contains(keyword) && candidate.defName.Contains(keyword))
                 {
-                    ModCore.LogDebug("    Compatible: both contain keyword " + keyword);
-                    return true;
+                    score += 3;
+                    ModCore.LogDebug("      +3 Shared keyword: " + keyword);
+                    break; // Only count one keyword match
                 }
             }
 
-            // Check for mod source similarity
+            // Lower priority: Mod source similarity
             string[] originalParts = originalDef.defName.Split('_');
             string[] candidateParts = candidate.defName.Split('_');
 
             if (originalParts.Length > 0 && candidateParts.Length > 0 &&
                 originalParts[0] == candidateParts[0])
             {
-                ModCore.LogDebug("    Compatible: same mod prefix");
-                return true;
+                score += 2;
+                ModCore.LogDebug("      +2 Same mod prefix");
             }
 
-            ModCore.LogDebug("    Not compatible: no matching criteria");
-            return false;
+            // Bonus: Natural enemy status match
+            if (originalDef.naturalEnemy == candidate.naturalEnemy)
+            {
+                score += 1;
+                ModCore.LogDebug("      +1 Same natural enemy status");
+            }
+
+            // Fallback: If no specific matches but both are basic vanilla-style factions
+            if (score == 10) // Only has enemy status match
+            {
+                if (IsBasicHumanlikeFaction(originalDef) && IsBasicHumanlikeFaction(candidate))
+                {
+                    score += 2;
+                    ModCore.LogDebug("      +2 Both are basic humanlike factions");
+                }
+            }
+
+            return score;
+        }
+
+        private bool IsBasicHumanlikeFaction(FactionDef def)
+        {
+            // Check if this is a basic humanlike faction (not highly specialized)
+            return def.humanlikeFaction &&
+                   !def.hidden &&
+                   !def.isPlayer &&
+                   def.pawnGroupMakers != null &&
+                   def.pawnGroupMakers.Count > 0;
+        }
+
+        private bool HasViablePawnGeneration(FactionDef def)
+        {
+            if (def.pawnGroupMakers == null || def.pawnGroupMakers.Count == 0)
+            {
+                ModCore.LogDebug("  " + def.defName + " has no pawn group makers");
+                return false;
+            }
+
+            ModCore.LogDebug("  " + def.defName + " checking " + def.pawnGroupMakers.Count + " pawn group makers:");
+
+            // Check if at least one pawn group maker has actual pawn generation content
+            foreach (var pgm in def.pawnGroupMakers)
+            {
+                if (pgm == null)
+                {
+                    ModCore.LogDebug("    PGM is null");
+                    continue;
+                }
+
+                if (pgm.kindDef == null)
+                {
+                    ModCore.LogDebug("    PGM has null kindDef");
+                    continue;
+                }
+
+                ModCore.LogDebug("    PGM " + pgm.kindDef.defName + ":");
+                ModCore.LogDebug("      guards: " + (pgm.guards?.Count ?? -1));
+                ModCore.LogDebug("      carriers: " + (pgm.carriers?.Count ?? -1));
+                ModCore.LogDebug("      traders: " + (pgm.traders?.Count ?? -1));
+
+                // CRITICAL: Try to force initialization of the pawn group maker
+                try
+                {
+                    // Force resolve references if not already done
+                    if (pgm.guards == null)
+                    {
+                        ModCore.LogDebug("      Attempting to initialize guards...");
+                        // Try to trigger initialization through reflection
+                        var traverse = Traverse.Create(pgm);
+
+                        // Some pawn group makers might need to be resolved
+                        var resolveMethod = AccessTools.Method(typeof(PawnGroupMaker), "ResolveReferences");
+                        if (resolveMethod != null)
+                        {
+                            resolveMethod.Invoke(pgm, null);
+                            ModCore.LogDebug("      Called ResolveReferences on PGM");
+                        }
+                    }
+
+                    // Check again after potential initialization
+                    ModCore.LogDebug("      After init attempt:");
+                    ModCore.LogDebug("        guards: " + (pgm.guards?.Count ?? -1));
+                    ModCore.LogDebug("        carriers: " + (pgm.carriers?.Count ?? -1));
+                    ModCore.LogDebug("        traders: " + (pgm.traders?.Count ?? -1));
+
+                    // Check for any non-empty pawn lists
+                    bool hasContent = false;
+
+                    if (pgm.guards != null && pgm.guards.Count > 0)
+                        hasContent = true;
+                    else if (pgm.carriers != null && pgm.carriers.Count > 0)
+                        hasContent = true;
+                    else if (pgm.traders != null && pgm.traders.Count > 0)
+                        hasContent = true;
+
+                    if (hasContent)
+                    {
+                        ModCore.LogDebug("      Found content, testing options generation...");
+                        // Quick test - can it generate options without crashing?
+                        try
+                        {
+                            var options = pgm.options;
+                            if (options != null && options.Count > 0)
+                            {
+                                ModCore.LogDebug("      SUCCESS: Generated " + options.Count + " options");
+                                return true; // Found at least one working pawn group maker
+                            }
+                            else
+                            {
+                                ModCore.LogDebug("      Options generation returned null or empty");
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            ModCore.LogDebug("      Options generation failed: " + e.Message);
+                            continue; // This pawn group maker is broken, try others
+                        }
+                    }
+                    else
+                    {
+                        ModCore.LogDebug("      No content found in any pawn lists");
+                    }
+                }
+                catch (Exception e)
+                {
+                    ModCore.LogDebug("      Exception during PGM analysis: " + e.Message);
+                    continue;
+                }
+            }
+
+            ModCore.LogDebug("  " + def.defName + " has no viable pawn generation");
+            return false; // No viable pawn group makers found
+        }
+
+        private void TryForceFactionDefInitialization(FactionDef def)
+        {
+            try
+            {
+                ModCore.LogDebug("  Forcing initialization for " + def.defName);
+
+                // Try to force resolution of the faction def
+                var resolveMethod = AccessTools.Method(typeof(FactionDef), "ResolveReferences");
+                if (resolveMethod != null)
+                {
+                    resolveMethod.Invoke(def, null);
+                    ModCore.LogDebug("    Called FactionDef.ResolveReferences");
+                }
+
+                // Try to force resolution of each pawn group maker
+                if (def.pawnGroupMakers != null)
+                {
+                    foreach (var pgm in def.pawnGroupMakers)
+                    {
+                        if (pgm != null)
+                        {
+                            var pgmResolveMethod = AccessTools.Method(typeof(PawnGroupMaker), "ResolveReferences");
+                            if (pgmResolveMethod != null)
+                            {
+                                pgmResolveMethod.Invoke(pgm, null);
+                                ModCore.LogDebug("    Called PawnGroupMaker.ResolveReferences for " + pgm.kindDef?.defName);
+                            }
+
+                            // Also try to force post-load initialization
+                            var postLoadMethod = AccessTools.Method(typeof(PawnGroupMaker), "PostLoadInit");
+                            if (postLoadMethod != null)
+                            {
+                                postLoadMethod.Invoke(pgm, null);
+                                ModCore.LogDebug("    Called PawnGroupMaker.PostLoadInit for " + pgm.kindDef?.defName);
+                            }
+
+                            // Log the state after initialization attempts
+                            ModCore.LogDebug("    After init - guards: " + (pgm.guards?.Count ?? -1) +
+                                ", carriers: " + (pgm.carriers?.Count ?? -1) +
+                                ", traders: " + (pgm.traders?.Count ?? -1));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ModCore.LogDebug("  Failed to force initialization for " + def.defName + ": " + e.Message);
+            }
         }
 
         private FactionDef SelectBestCandidate(List<FactionDef> candidates)
@@ -257,14 +612,14 @@ namespace LemProgress.Systems
                 return candidates.RandomElement();
             }
 
-            // Score candidates based on similarity
+            // Score candidates based on similarity using the same scoring system
             var scored = new List<ScoredFactionDef>();
             foreach (var candidate in candidates)
             {
                 scored.Add(new ScoredFactionDef
                 {
                     Def = candidate,
-                    Score = CalculateSimilarityScore(candidate)
+                    Score = CalculateCompatibilityScore(candidate) // Reuse the same scoring logic
                 });
             }
 
@@ -274,37 +629,18 @@ namespace LemProgress.Systems
             // Select from top candidates with some randomness
             int topCount = Math.Max(1, scored.Count / 3);
             var topCandidates = scored.Take(topCount).ToList();
-            return topCandidates.RandomElement().Def;
+
+            var selected = topCandidates.RandomElement();
+            ModCore.LogDebug("    Selected " + selected.Def.defName + " with score " + selected.Score +
+                " from " + topCandidates.Count + " top candidates");
+
+            return selected.Def;
         }
 
         private class ScoredFactionDef
         {
             public FactionDef Def { get; set; }
             public int Score { get; set; }
-        }
-
-        private int CalculateSimilarityScore(FactionDef candidate)
-        {
-            int score = 0;
-
-            if (candidate.categoryTag == originalDef.categoryTag)
-                score += 10;
-            if (candidate.permanentEnemy == originalDef.permanentEnemy)
-                score += 5;
-            if (candidate.naturalEnemy == originalDef.naturalEnemy)
-                score += 3;
-
-            // Check for mod source similarity
-            string[] original = originalDef.defName.Split('_');
-            string[] candidateParts = candidate.defName.Split('_');
-
-            if (original.Length > 0 && candidateParts.Length > 0 &&
-                original[0] == candidateParts[0])
-            {
-                score += 7;
-            }
-
-            return score;
         }
 
         private void ClearPawnGenerationCaches()
@@ -375,13 +711,43 @@ namespace LemProgress.Systems
                 if (pawnGroupMaker.traders == null)
                     pawnGroupMaker.traders = new List<PawnGenOption>();
 
-                // Try to get options through reflection if the property is problematic
+                // Clear and reinitialize options cache
                 var traverse = Traverse.Create(pawnGroupMaker);
                 var optionsField = traverse.Field("_options");
-                if (optionsField.FieldExists() && optionsField.GetValue() == null)
+                if (optionsField.FieldExists())
                 {
-                    optionsField.SetValue(new List<PawnGenOption>());
-                    ModCore.LogDebug("Initialized empty options list for problematic pawn group maker");
+                    optionsField.SetValue(null);
+                }
+
+                // Force options regeneration and ensure it's not null
+                try
+                {
+                    var options = pawnGroupMaker.options;
+                    if (options == null)
+                    {
+                        Log.Warning("[" + ModCore.ModId + "] PawnGroupMaker options still null after regeneration, " +
+                            "this may indicate a deeper issue with the faction def");
+
+                        // As a last resort, try to set an empty options list
+                        if (optionsField.FieldExists())
+                        {
+                            optionsField.SetValue(new List<PawnGenOption>());
+                        }
+                    }
+                    else
+                    {
+                        ModCore.LogDebug("Successfully ensured " + options.Count + " pawn options for pawn group maker");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Warning("[" + ModCore.ModId + "] Could not regenerate pawn options: " + e.Message);
+
+                    // Set empty list as fallback
+                    if (optionsField.FieldExists())
+                    {
+                        optionsField.SetValue(new List<PawnGenOption>());
+                    }
                 }
             }
             catch (Exception e)
@@ -392,7 +758,55 @@ namespace LemProgress.Systems
 
         private void UpdateFactionAssets()
         {
-            UpdateSettlements();
+          //  UpdateSettlements();
+            ClearWorldCaches();
+        }
+
+        private void ClearWorldCaches()
+        {
+            try
+            {
+                // Clear world-level caches that might reference old faction defs
+                if (Find.World?.factionManager != null)
+                {
+                    var factionManagerTraverse = Traverse.Create(Find.World.factionManager);
+
+                    // Clear any cached faction lists or raid-related caches
+                    string[] worldCacheFields = new string[]
+                    {
+                        "cachedAllFactions", "cachedAllFactionsInViewOrder",
+                        "cachedNonPlayerFactions", "cachedHostileFactions"
+                    };
+
+                    foreach (var fieldName in worldCacheFields)
+                    {
+                        var field = factionManagerTraverse.Field(fieldName);
+                        if (field.FieldExists())
+                        {
+                            field.SetValue(null);
+                            ModCore.LogDebug("Cleared world cache: " + fieldName);
+                        }
+                    }
+                }
+
+                // Clear storyteller caches that might affect raid generation
+                if (Find.Storyteller != null)
+                {
+                    var storytellerTraverse = Traverse.Create(Find.Storyteller);
+                    var incidentQueueField = storytellerTraverse.Field("incidentQueue");
+                    if (incidentQueueField.FieldExists())
+                    {
+                        // Don't clear the queue, but we might need to in the future
+                        ModCore.LogDebug("Storyteller incident queue exists");
+                    }
+                }
+
+                ModCore.LogDebug("Cleared world-level caches for faction upgrade");
+            }
+            catch (Exception e)
+            {
+                ModCore.LogDebug("Failed to clear world caches: " + e.Message);
+            }
         }
 
         private void UpdateSettlements()
