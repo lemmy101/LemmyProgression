@@ -4,7 +4,37 @@
 <packageId>LemmyMods.LemProgression</packageId>
 <author>Lemmy</author>
 
-<description>Adds world progression to ferny's progression modpack (quests, pawns, factions etc)</description>
+<description>
+WARNING: This mod is in early alpha. Please don't add to any game you have any fear of breaking or corrupting! Early tests indicate everything works fine but I'm sure it may cause issues with particular mods or perhaps in circumstances in the game I've not run into yet!
+
+OVERVIEW
+
+This mod interacts with the Vanilla Factions Expanded: Tribes, as well as the World Tech Level mods to provide a way to utilize World Tech Level's filtering of reward items, quests and other aspects of the game to the appropriate tech level to avoid say guns or genepacks appearing when a player is at Medieval tech level, and so on.
+
+At the same time, it removes the limitations of World Tech Level forcing the entire world to remain at that tech level forever more.
+
+The player will have access to all technologies, irrespective of World Tech Level's setting. Once the player techs up via ritual, the mod will push up the World Tech Level, and also give all other factions on the map a potential % chance of teching up themselves. If they are chosen to tech up, they will be upgraded to use that tech level's tech
+
+This mod was built specifically with ferny's Progression Mod Pack in mind: https://steamcommunity.com/workshop/filedetails/?id=3521297585 - but will work just fine without.
+
+KNOWN ISSUES
+
+* Some of the specific mod options for stuff may not be functional yet and are just placeholder. For now the important one is % chance of factions teching up
+
+* Factions tech up by essentially substituting their database definition for another faction definition from the next tech level - attempts are made to make this make sense, but at the moment this isn't very intelligently done, so its very likely some odd things may happen like a faction becoming aliens, or having a wildly different asthetic or ideology. I hope to improve this in future.
+
+* At the moment it requires Medieval Overhaul, as without it there are no medieval factions to progress up the tech tree, though I'll look into a work around to remove this prerequisite by making other factions skip the medieval stage if no suitable factions exist. However tbh it seems to make little sense to be playing a progression playthrough without Medieval Overhaul, so...
+
+RECOMMENDED MODS
+
+Worldbuilder - https://steamcommunity.com/sharedfiles/filedetails/?id=3522102833&searchtext=worldbuilder - With Worldbuilder installed, you will have access to a Tribal World planet which will create tribes for all other factions. Then once you start teching up these other factions will tech up as well, though some will get left behind resulting in a diverse spread of tech levels.
+
+ADHD WARNING
+
+I made this mod for my own playthrough, and between work and me being me, I'm under no illusions of my ability to stay focused/interested and continue to support and develop this mod in the long term, particularly if patches render it incompatible and I've moved onto some other hyper fixation. I see no reason it wouldn't stay functional until 1.7, but even so I feel the need to point out. 
+
+As such I've uploaded the code here and will continue to update it here as I work on it: https://github.com/lemmy101/LemmyProgression and anyone is welcome to use it, update it, integrate it in any way it may be useful if I'm not around or responding. Credit appreciated if so though.  
+</description>
 
 <supportedVersions>
   <li>1.6</li>
