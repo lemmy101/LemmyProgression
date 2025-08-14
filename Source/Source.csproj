@@ -68,6 +68,12 @@
       <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
     <Reference Include="VFETribals">
       <HintPath>..\..\..\..\..\workshop\content\294100\3079786283\1.6\Assemblies\VFETribals.dll</HintPath>
       <Private>False</Private>
@@ -78,13 +84,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CrossModPatcher.cs" />
-    <Compile Include="FactionDefUtility.cs" />
-    <Compile Include="FactionTechUpgrader.cs" />
-    <Compile Include="LemmyProgression.cs" />
+    <Compile Include="ModCore.cs" />
+    <Compile Include="Patches\PatchManager.cs" />
+    <Compile Include="Patches\VFETribalsPatch.cs" />
+    <Compile Include="Patches\WorldTechLevelPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TechLevelPatcher.cs" />
-    <Compile Include="WorldEraAdvancer.cs" />
+    <Compile Include="Settings\LemProgressSettings.cs" />
+    <Compile Include="Systems\FactionDefCopier.cs" />
+    <Compile Include="Systems\FactionUpgradeManager.cs" />
+    <Compile Include="Systems\FactionUpgrader.cs" />
+    <Compile Include="Systems\LemProgressMod.cs" />
+    <Compile Include="Systems\WorldEraManager.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
