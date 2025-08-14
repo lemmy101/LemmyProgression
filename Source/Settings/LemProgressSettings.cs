@@ -7,19 +7,15 @@ namespace LemProgress.Settings
 {
     public class LemProgressSettings : ModSettings
     {
+        // Master Enable/Disable
+        public bool modEnabled = true;
+
         // Faction Upgrade Settings
         public float factionUpgradeChance = 0.5f;
         public int maxUltraFactions = 1;
         public bool onlyUpgradeOneStepAtTime = false;
         public bool preferSimilarFactionTypes = true;
         public int maxTechLevelsBehindToUpgrade = 4; // How many levels behind can still upgrade
-
-        // Preservation Settings
-        public bool preserveFactionNames = true;
-        public bool preserveFactionDescriptions = true;
-        public bool preserveFactionRelations = true;
-        public bool preserveFactionColors = true;
-        public bool preserveFactionIcons = false;
 
         // Tech Level Settings
         public bool allowDowngrades = false;
@@ -39,28 +35,21 @@ namespace LemProgress.Settings
             { "Archotech", false }
         };
 
-        // Faction Management Settings
-        public bool ensureUniqueFactionDefs = true;
-
         // Filter Settings
         public List<string> blacklistedFactionDefs = new List<string>();
         public List<string> whitelistedFactionDefs = new List<string>();
 
         public override void ExposeData()
         {
+            // Master setting
+            Scribe_Values.Look(ref modEnabled, "modEnabled", true);
+
             // Basic settings
             Scribe_Values.Look(ref factionUpgradeChance, "factionUpgradeChance", 0.5f);
             Scribe_Values.Look(ref maxUltraFactions, "maxUltraFactions", 1);
             Scribe_Values.Look(ref onlyUpgradeOneStepAtTime, "onlyUpgradeOneStepAtTime", false);
             Scribe_Values.Look(ref preferSimilarFactionTypes, "preferSimilarFactionTypes", true);
             Scribe_Values.Look(ref maxTechLevelsBehindToUpgrade, "maxTechLevelsBehindToUpgrade", 2);
-
-            // Preservation settings
-            Scribe_Values.Look(ref preserveFactionNames, "preserveFactionNames", true);
-            Scribe_Values.Look(ref preserveFactionDescriptions, "preserveFactionDescriptions", true);
-            Scribe_Values.Look(ref preserveFactionRelations, "preserveFactionRelations", true);
-            Scribe_Values.Look(ref preserveFactionColors, "preserveFactionColors", true);
-            Scribe_Values.Look(ref preserveFactionIcons, "preserveFactionIcons", false);
 
             // Tech level settings
             Scribe_Values.Look(ref allowDowngrades, "allowDowngrades", false);
@@ -70,9 +59,6 @@ namespace LemProgress.Settings
             // Advanced settings
             Scribe_Values.Look(ref debugLogging, "debugLogging", false);
             Scribe_Values.Look(ref autoUpgradePlayerFaction, "autoUpgradePlayerFaction", false);
-
-            // Faction management settings
-            Scribe_Values.Look(ref ensureUniqueFactionDefs, "ensureUniqueFactionDefs", true);
 
             // Collections
             Scribe_Collections.Look(ref techLevelUpgradeEnabled, "techLevelUpgradeEnabled",
@@ -120,21 +106,14 @@ namespace LemProgress.Settings
 
         public bool IsFactionDefAllowed(string defName)
         {
-            // Strip our unique suffix if present to check against original def name
-            var originalDefName = defName;
-            if (defName.Contains("_LemProg_"))
-            {
-                originalDefName = defName.Substring(0, defName.IndexOf("_LemProg_"));
-            }
-
             // If we have a whitelist, only allow those
             if (whitelistedFactionDefs != null && whitelistedFactionDefs.Count > 0)
             {
-                return whitelistedFactionDefs.Contains(originalDefName);
+                return whitelistedFactionDefs.Contains(defName);
             }
 
             // Otherwise, check blacklist
-            if (blacklistedFactionDefs != null && blacklistedFactionDefs.Contains(originalDefName))
+            if (blacklistedFactionDefs != null && blacklistedFactionDefs.Contains(defName))
             {
                 return false;
             }
@@ -145,16 +124,11 @@ namespace LemProgress.Settings
 
         public void ResetToDefaults()
         {
+            modEnabled = true;
             factionUpgradeChance = 0.5f;
             maxUltraFactions = 1;
             onlyUpgradeOneStepAtTime = false;
             preferSimilarFactionTypes = true;
-
-            preserveFactionNames = true;
-            preserveFactionDescriptions = true;
-            preserveFactionRelations = true;
-            preserveFactionColors = true;
-            preserveFactionIcons = false;
 
             allowDowngrades = false;
             notifyOnFactionUpgrade = true;

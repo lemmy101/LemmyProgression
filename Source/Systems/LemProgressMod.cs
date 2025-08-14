@@ -18,7 +18,6 @@ namespace LemProgress.Settings
         private enum SettingsTab
         {
             General,
-            Preservation,
             TechLevels,
             FactionFilter,
             Advanced
@@ -56,9 +55,6 @@ namespace LemProgress.Settings
                 case SettingsTab.General:
                     DrawGeneralSettings(contentRect);
                     break;
-                case SettingsTab.Preservation:
-                    DrawPreservationSettings(contentRect);
-                    break;
                 case SettingsTab.TechLevels:
                     DrawTechLevelSettings(contentRect);
                     break;
@@ -83,9 +79,9 @@ namespace LemProgress.Settings
 
         private void DrawTabs(Rect rect)
         {
-            float tabWidth = rect.width / 5f;
+            float tabWidth = rect.width / 4f;
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 4; i++)
             {
                 SettingsTab tab = (SettingsTab)i;
                 Rect tabButton = new Rect(rect.x + (i * tabWidth), rect.y, tabWidth - 2f, rect.height);
@@ -107,97 +103,72 @@ namespace LemProgress.Settings
             Listing_Standard listing = new Listing_Standard();
             listing.Begin(rect);
 
-            listing.Label((TaggedString)"General Settings", -1f, "Configure basic faction upgrade behavior");
+            // Master enable/disable at the top
+            listing.Label((TaggedString)"Master Settings", -1f, "Enable or disable the entire mod");
             listing.GapLine();
             listing.Gap();
 
-            // Faction upgrade chance
-            string chanceLabel = "Faction Upgrade Chance: " + (settings.factionUpgradeChance * 100f).ToString("F0") + "%";
-            listing.Label(chanceLabel);
-            settings.factionUpgradeChance = listing.Slider(settings.factionUpgradeChance, 0f, 1f);
+            listing.CheckboxLabeled("Enable Lemmy's Tech Progression",
+                ref settings.modEnabled,
+                "Master switch to enable/disable all mod functionality");
+
             listing.Gap();
-
-            // Max ultra factions
-            string ultraLabel = "Maximum Ultra-Tech Factions: " + settings.maxUltraFactions;
-            listing.Label(ultraLabel);
-            settings.maxUltraFactions = (int)listing.Slider(settings.maxUltraFactions, 0, 10);
-            listing.Gap();
-
-            // Checkboxes
-            listing.CheckboxLabeled("Only upgrade factions one tech level at a time",
-                ref settings.onlyUpgradeOneStepAtTime,
-                "If checked, factions will only advance one tech level per era advancement");
-
-            listing.CheckboxLabeled("Prefer similar faction types when upgrading",
-                ref settings.preferSimilarFactionTypes,
-                "If checked, the mod will try to maintain faction identity when upgrading");
-
-            // Max tech levels behind
-            listing.Gap();
-            string levelsBehindLabel = "Max tech levels behind to upgrade: " + settings.maxTechLevelsBehindToUpgrade;
-            listing.Label(levelsBehindLabel);
-            listing.Label("Factions more than " + settings.maxTechLevelsBehindToUpgrade +
-                " levels behind won't be upgraded", -1f);
-            settings.maxTechLevelsBehindToUpgrade = (int)listing.Slider(settings.maxTechLevelsBehindToUpgrade, 1, 5);
-
-            listing.CheckboxLabeled("Show notifications when factions upgrade",
-                ref settings.notifyOnFactionUpgrade,
-                "Display a message when a faction advances to a new tech level");
-
-            listing.CheckboxLabeled("Allow faction downgrades",
-                ref settings.allowDowngrades,
-                "WARNING: Allows factions to regress to lower tech levels");
-
-            // Settlement upgrade delay
-            listing.Gap();
-            string delayLabel = "Settlement Upgrade Delay: " + settings.settlementUpgradeDelay.ToString("F0") + " days";
-            listing.Label(delayLabel);
-            settings.settlementUpgradeDelay = listing.Slider(settings.settlementUpgradeDelay, 0f, 60f);
-
-            // Faction management settings
-            listing.Gap();
-            listing.Label("Faction Management:");
-
-            listing.CheckboxLabeled("Ensure unique faction defs",
-                ref settings.ensureUniqueFactionDefs,
-                "Each faction gets its own def instance to prevent shared upgrades when multiple factions use the same base def");
-
-            listing.End();
-        }
-
-        private void DrawPreservationSettings(Rect rect)
-        {
-            Listing_Standard listing = new Listing_Standard();
-            listing.Begin(rect);
-
-            listing.Label((TaggedString)"Preservation Settings", -1f,
-                "Choose what faction properties to preserve during upgrades");
             listing.GapLine();
             listing.Gap();
 
-            listing.CheckboxLabeled("Preserve faction names",
-                ref settings.preserveFactionNames,
-                "Keep original faction names when upgrading");
+            // Only show other settings if mod is enabled
+            if (settings.modEnabled)
+            {
+                listing.Label((TaggedString)"Faction Upgrade Settings", -1f, "Configure faction upgrade behavior");
+                listing.Gap();
 
-            listing.CheckboxLabeled("Preserve faction descriptions",
-                ref settings.preserveFactionDescriptions,
-                "Keep original faction descriptions");
+                // Faction upgrade chance
+                string chanceLabel = "Faction Upgrade Chance: " + (settings.factionUpgradeChance * 100f).ToString("F0") + "%";
+                listing.Label(chanceLabel);
+                settings.factionUpgradeChance = listing.Slider(settings.factionUpgradeChance, 0f, 1f);
+                listing.Gap();
 
-            listing.CheckboxLabeled("Preserve faction relations",
-                ref settings.preserveFactionRelations,
-                "Maintain diplomatic relations and hostility settings");
+                // Max ultra factions
+                string ultraLabel = "Maximum Ultra-Tech Factions: " + settings.maxUltraFactions;
+                listing.Label(ultraLabel);
+                settings.maxUltraFactions = (int)listing.Slider(settings.maxUltraFactions, 0, 10);
+                listing.Gap();
 
-            listing.CheckboxLabeled("Preserve faction colors",
-                ref settings.preserveFactionColors,
-                "Keep faction color schemes");
+                // Checkboxes
+                listing.CheckboxLabeled("Only upgrade factions one tech level at a time",
+                    ref settings.onlyUpgradeOneStepAtTime,
+                    "If checked, factions will only advance one tech level per era advancement");
 
-            listing.CheckboxLabeled("Preserve faction icons",
-                ref settings.preserveFactionIcons,
-                "Keep faction icons and symbols");
+                listing.CheckboxLabeled("Prefer similar faction types when upgrading",
+                    ref settings.preferSimilarFactionTypes,
+                    "If checked, the mod will try to maintain faction identity when upgrading");
 
-            listing.Gap();
-            listing.Label("Tip: Disabling preservation options allows factions to fully adopt " +
-                         "new identities when upgrading.", -1f);
+                // Max tech levels behind
+                listing.Gap();
+                string levelsBehindLabel = "Max tech levels behind to upgrade: " + settings.maxTechLevelsBehindToUpgrade;
+                listing.Label(levelsBehindLabel);
+                listing.Label("Factions more than " + settings.maxTechLevelsBehindToUpgrade +
+                    " levels behind won't be upgraded", -1f);
+                settings.maxTechLevelsBehindToUpgrade = (int)listing.Slider(settings.maxTechLevelsBehindToUpgrade, 1, 5);
+
+                listing.CheckboxLabeled("Show notifications when factions upgrade",
+                    ref settings.notifyOnFactionUpgrade,
+                    "Display a message when a faction advances to a new tech level");
+
+                listing.CheckboxLabeled("Allow faction downgrades",
+                    ref settings.allowDowngrades,
+                    "WARNING: Allows factions to regress to lower tech levels");
+
+                // Settlement upgrade delay
+                listing.Gap();
+                string delayLabel = "Settlement Upgrade Delay: " + settings.settlementUpgradeDelay.ToString("F0") + " days";
+                listing.Label(delayLabel);
+                settings.settlementUpgradeDelay = listing.Slider(settings.settlementUpgradeDelay, 0f, 60f);
+            }
+            else
+            {
+                listing.Label("Mod is disabled. Enable it above to configure settings.", -1f);
+            }
 
             listing.End();
         }
@@ -211,6 +182,13 @@ namespace LemProgress.Settings
                 "Configure which tech levels factions can upgrade to");
             listing.GapLine();
             listing.Gap();
+
+            if (!settings.modEnabled)
+            {
+                listing.Label("Mod is disabled. Enable it in General settings to configure tech levels.", -1f);
+                listing.End();
+                return;
+            }
 
             string[] techLevels = new string[]
             {
@@ -252,6 +230,13 @@ namespace LemProgress.Settings
             headerListing.GapLine();
 
             headerListing.End();
+
+            if (!settings.modEnabled)
+            {
+                Rect disabledRect = new Rect(rect.x, rect.y + 65f, rect.width, 30f);
+                Widgets.Label(disabledRect, "Mod is disabled. Enable it in General settings to configure filters.");
+                return;
+            }
 
             // Search bar
             Rect searchRect = new Rect(rect.x, rect.y + 65f, rect.width - 20f, 25f);
@@ -373,26 +358,6 @@ namespace LemProgress.Settings
                     ResetAllFactionCaches();
                 }
 
-                if (listing.ButtonText("Force Refresh All Factions"))
-                {
-                    ForceRefreshAllFactions();
-                }
-
-                if (listing.ButtonText("Show Faction Def Usage"))
-                {
-                    ShowFactionDefUsage();
-                }
-
-                if (listing.ButtonText("Ensure Unique Faction Defs"))
-                {
-                    EnsureAllFactionsHaveUniqueDefs();
-                }
-
-                if (listing.ButtonText("Validate Def Uniqueness"))
-                {
-                    ValidateDefUniqueness();
-                }
-
                 if (listing.ButtonText("List Available Faction Defs"))
                 {
                     ListAvailableFactionDefs();
@@ -477,93 +442,6 @@ namespace LemProgress.Settings
             Messages.Message("Reset " + count + " faction pawn group caches", MessageTypeDefOf.NeutralEvent);
         }
 
-        private void ForceRefreshAllFactions()
-        {
-            if (Find.World == null || Find.World.factionManager == null) return;
-
-            foreach (var faction in Find.World.factionManager.AllFactions)
-            {
-                if (!faction.IsPlayer)
-                {
-                    // Force recache
-                    if (faction.def.pawnGroupMakers != null)
-                    {
-                        foreach (var pgm in faction.def.pawnGroupMakers)
-                        {
-                            var temp = pgm.options; // Access to force regeneration
-                        }
-                    }
-                }
-            }
-
-            Messages.Message("Force refreshed all faction pawn generation", MessageTypeDefOf.NeutralEvent);
-        }
-
-        private void ShowFactionDefUsage()
-        {
-            if (Find.World == null || Find.World.factionManager == null) return;
-
-            var stats = Systems.FactionDefManager.GetDefUsageStats();
-
-            Log.Message("=== Faction Def Usage ===");
-            foreach (var stat in stats.OrderByDescending(s => s.Value.TotalCount))
-            {
-                Log.Message("Original Def: " + stat.Key + " - " + stat.Value.TotalCount + " faction(s)");
-                foreach (var faction in stat.Value.Factions)
-                {
-                    string uniqueStatus = faction.IsUnique ? " [UNIQUE]" : " [SHARED]";
-                    Log.Message("  - " + faction.Name + " (" + faction.CurrentDefName + ")" + uniqueStatus);
-                }
-            }
-
-            Messages.Message("Faction def usage logged to console", MessageTypeDefOf.NeutralEvent);
-        }
-
-        private void EnsureAllFactionsHaveUniqueDefs()
-        {
-            if (Find.World == null || Find.World.factionManager == null) return;
-
-            int count = 0;
-            var factionsToMakeUnique = new List<Faction>();
-
-            foreach (var faction in Find.World.factionManager.AllFactions)
-            {
-                if (!faction.IsPlayer)
-                {
-                    factionsToMakeUnique.Add(faction);
-                }
-            }
-
-            Systems.FactionDefManager.EnsureUniqueDefsForUpgrade(factionsToMakeUnique);
-
-            Messages.Message("Ensured " + factionsToMakeUnique.Count + " factions have unique defs",
-                MessageTypeDefOf.NeutralEvent);
-        }
-
-        private void ValidateDefUniqueness()
-        {
-            if (Find.World == null || Find.World.factionManager == null) return;
-
-            var stats = Systems.FactionDefManager.GetDefUsageStats();
-            int sharedDefs = 0;
-            int uniqueDefs = 0;
-
-            foreach (var stat in stats)
-            {
-                foreach (var faction in stat.Value.Factions)
-                {
-                    if (faction.IsUnique)
-                        uniqueDefs++;
-                    else
-                        sharedDefs++;
-                }
-            }
-
-            string message = "Def Status: " + uniqueDefs + " unique, " + sharedDefs + " shared";
-            Messages.Message(message, MessageTypeDefOf.NeutralEvent);
-            Log.Message("[" + ModCore.ModId + "] " + message);
-        }
-
         private void ListAvailableFactionDefs()
         {
             Log.Message("=== Available Faction Defs by Tech Level ===");
@@ -579,8 +457,7 @@ namespace LemProgress.Settings
                     if (def.techLevel == techLevel &&
                         def.humanlikeFaction &&
                         !def.isPlayer &&
-                        !def.hidden &&
-                        !def.defName.Contains("_LemProg_")) // Skip our unique copies
+                        !def.hidden)
                     {
                         defsAtLevel.Add(def);
                     }
